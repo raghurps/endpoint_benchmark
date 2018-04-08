@@ -1,8 +1,9 @@
 # EndpointBenchmark
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/endpoint_benchmark`. To experiment with that code, run `bin/console` for an interactive prompt.
+[![CircleCI](https://circleci.com/gh/rpsraghu/endpoint_benchmark/tree/master.svg?style=svg)](https://circleci.com/gh/rpsraghu/endpoint_benchmark/tree/master)
 
-TODO: Delete this and the text above, and describe your gem
+Welcome to this new gem! This gem exposes a CLI via which one can monitor average response
+time for an endpoint over a given period of time
 
 ## Installation
 
@@ -22,7 +23,18 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+    $ benchmark -h
+    Usage: benchmark [options] [host]
+    Defaults: benchmark -t https -i 10 -d 60 -n gitlab.com
+        -t, --type TRANSPORT             Transport type
+        -i, --interval INTERVAL          Interval over which to retry benchmarking
+        -d, --duration DURATION          Duration over which benchmark iteration resides
+        -n, --hostname MYDOMAIN.COM      Host to perform benchmark
+        -v, --[no-]verbose               Run command in verbose mode
+        -h, --help                       Show this help message
+            --[no-]insecure              Use this option for self-signed certificate
+            --version                    Show 
+    $ benchmark -i 10 -d 10 -t https -n github.com
 
 ## Development
 
@@ -32,7 +44,7 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/endpoint_benchmark. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
+Bug reports and pull requests are welcome on GitHub at https://github.com/rpsraghu/endpoint_benchmark. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
 
 ## License
 
@@ -40,4 +52,4 @@ The gem is available as open source under the terms of the [MIT License](https:/
 
 ## Code of Conduct
 
-Everyone interacting in the EndpointBenchmark project’s codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/[USERNAME]/endpoint_benchmark/blob/master/CODE_OF_CONDUCT.md).
+Everyone interacting in the EndpointBenchmark project’s codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/rpsraghu/endpoint_benchmark/blob/master/CODE_OF_CONDUCT.md).
