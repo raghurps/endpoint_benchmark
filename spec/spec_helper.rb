@@ -1,5 +1,16 @@
+require "simplecov"
+
+SimpleCov.start do
+  root File.join(File.dirname(__FILE__), '..')
+  add_filter '/spec/'
+  add_group 'Libraries', 'lib'
+#  add_group 'Services', 'lib/*'
+end
+
 require "bundler/setup"
 require "endpoint_benchmark"
+
+RSpec::Mocks.configuration.allow_message_expectations_on_nil = true
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure

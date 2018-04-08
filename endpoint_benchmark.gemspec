@@ -13,6 +13,7 @@ Gem::Specification.new do |spec|
   spec.description   = %q{A tool to monitor average request response time for an endpoint server}
   spec.homepage      = "http://github.com"
   spec.license       = "MIT"
+  spec.required_ruby_version = ['>= 2.0.0', '<= 2.5.0']
 
   # Prevent pushing this gem to RubyGems.org. To allow pushes either set the 'allowed_push_host'
   # to allow pushing to a single host or delete this section to allow pushing to any host.
@@ -30,7 +31,9 @@ Gem::Specification.new do |spec|
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
 
-  spec.add_development_dependency "bundler", "~> 1.16"
+  spec.add_development_dependency "bundler", "~> 1.14"
   spec.add_development_dependency "rake", "~> 10.0"
   spec.add_development_dependency "rspec", "~> 3.0"
+  spec.add_development_dependency "simplecov", "~> 0.16"
+  spec.add_development_dependency "rspec_junit_formatter", "~> 0.3"
 end

@@ -1,58 +1,104 @@
 require 'uri'
 require 'net/http'
 
-class EndpointBenchmark::Http
+module EndpointBenchmark
+  class Http
 
-  SELF_SIGNED_CERTIFICATE = false
-
-  def self.make_from_args(**args)
-    if args[:url].present?
-      return self.new(args)
-    else
-      return nil
-    end
-  end
-
-  def initialize(**args)
-    begin
-      uri = URI(args[:url])
-      args[:self_signed] ||= SELF_SIGNED_CERTIFICATE
-      @http = Net::HTTP.new(uri.host, uri.port)
-      @http.open_timeout = 5
-    
-      if url.include?('https:')
-        @http.use_ssl = true
-        @http.verify_mode = OpenSSL::SSL::VERIFY_NONE if args[:self_signed]
+    def self.make_from_args(**args)
+      if !args[:host].nil? && !args[:type].nil? &&
+          ['http', 'https'].include?(args[:type]) &&
+          !args[:logger].nil?
+        return self.new(args)
+      else
+        return nil
       end
-    rescue StandardError => e
-      puts "Initialization failed!"
-      puts e.inspect
+    end
+
+    def initialize(**args)
+      # initialize logger
+      @logger ||= args[:logger]
+
+      begin
+        url = args[:type] + '://' + args[:host]
+        uri = URI(url)
+        args[:self_signed] ||= EndpointBenchmark::SELF_SIGNED_CERTIFICATE
+        @http = Net::HTTP.new(uri.host, uri.port)
+        #@http.open_timeout = 5
+
+      
+        if url.include?('https:')
+          @http.use_ssl = true
+          @http.verify_mode = OpenSSL::SSL::VERIFY_NONE if args[:self_signed]
+        end
+
+        @logger.info "Initialized HTTP object for URL: [#{url}]"
+      rescue StandardError => e
+        @logger.error "Initialization failed!"
+        @logger.error e.inspect
+      end
+    end
+
+    def head_request
+      try_head_request
+    end
+
+    def get_request
+      try_get_request
+    end
+
+    private
+
+    attr_accessor :http, :logger
+
+    def try_head_request
+      # Returning true or false based on successful
+      # http connection
+      success = false
+      begin
+        request = Net::HTTP::Head.new('/')
+
+        logger.debug "Sending HTTP HEAD request: #{request}"
+        start_time = Time.now
+        response = http.request(request)
+        elapsed_time = Time.now - start_time
+
+        logger.debug "Got [#{response.code}] response for HEAD" +
+            " request [#{request}]: #{response.body}"
+        logger.info "Site responded with code: [#{response.code.to_i}]! :)"
+        success = true
+      rescue StandardError => e
+        logger.error "HEAD request failed!"
+        logger.error e.inspect
+      ensure
+        return success
+      end
+    end
+
+    def try_get_request
+      # Returning true or false based on successful
+      # http connection
+      success = false
+      begin
+        request = Net::HTTP::Get.new('/')
+
+        logger.debug "Sending HTTP GET request: #{request}"
+
+        start_time = Time.now
+        response = http.request(request)
+        elapsed_time = Time.now - start_time
+
+        logger.debug "Got [#{response.code}] response for GET request "+
+            "[#{request}]: #{response.body}"
+        logger.info "Site responded with code: [#{response.code.to_i}]! :)"
+        success = true
+      rescue StandardError => e
+        logger.error "HEAD request failed!"
+        logger.error e.inspect
+      ensure
+        return success
+      end
     end
   end
 
-  private
-
-  attr_accessor :http
-
-  def try_head_request
-    request = Net::HTTP::Head.new('/')
-    response = http.request(request)
-
-    if response.code.to_i < 400
-      puts "Site is Up! :)"
-    else
-      puts "Site is down! :("
-    end
-  end
-
-  def try_get_request
-    request = Net::HTTP::Get.new('/')
-    response = http.request(request)
-
-    if response.code.to_i < 400
-      puts "Site is Up! :)"
-    else
-      puts "Site is down! :("
-    end
-  end
+  Https = Http
 end

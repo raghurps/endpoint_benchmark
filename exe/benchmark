@@ -1,0 +1,31 @@
+#!/usr/bin/env ruby
+
+require 'endpoint_benchmark'
+
+options = {}
+# Parse CLI arguments
+options = EndpointBenchmark::OptParser.parse(ARGV, options)
+
+exit(0) if options.empty?
+
+# Set verbosity based on CLI argument if provided
+ENV['VERBOSE'] = options[:verbose].to_s || 'false'
+
+# Set log level if not provided via env
+ENV['LOG_LEVEL'] = 'INFO'
+
+# Initialize logger
+logger = EndpointBenchmark::LogService.make_from_filename("#{Dir.pwd}/#{EndpointBenchmark::DEFAULT_LOG_FILE}")
+
+# Provide log handle in options hash
+options[:logger] = logger
+
+avg_resp_time = EndpointBenchmark::BenchmarkTool.begin_benchmark(options)
+
+if avg_resp_time == -1
+  puts "please check the logs at: #{Dir.pwd}/#{EndpointBenchmark::DEFAULT_LOG_FILE}"
+  exit(1)
+else
+  puts "Average response time for #{options[:type]}://#{options[:host]} is: #{avg_resp_time}"
+  exit(0)
+end
