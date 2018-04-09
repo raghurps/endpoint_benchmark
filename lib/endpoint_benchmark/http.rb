@@ -2,16 +2,17 @@ require 'uri'
 require 'net/http'
 
 module EndpointBenchmark
+  # Custom HTTP class
   class Http
-
     def self.make_from_args(**args)
+      ret_obj = nil
       if !args[:host].nil? && !args[:type].nil? &&
-          ['http', 'https'].include?(args[:type]) &&
-          !args[:logger].nil?
-        return self.new(args)
-      else
-        return nil
+         %w[http https].include?(args[:type]) &&
+         !args[:logger].nil?
+        ret_obj = EndpointBenchmark::Http.new(args)
       end
+
+      ret_obj
     end
 
     def initialize(**args)
@@ -23,9 +24,8 @@ module EndpointBenchmark
         uri = URI(url)
         args[:self_signed] ||= EndpointBenchmark::SELF_SIGNED_CERTIFICATE
         @http = Net::HTTP.new(uri.host, uri.port)
-        #@http.open_timeout = 5
+        # @http.open_timeout = 5
 
-      
         if url.include?('https:')
           @http.use_ssl = true
           @http.verify_mode = OpenSSL::SSL::VERIFY_NONE if args[:self_signed]
@@ -33,7 +33,7 @@ module EndpointBenchmark
 
         @logger.info "Initialized HTTP object for URL: [#{url}]"
       rescue StandardError => e
-        @logger.error "Initialization failed!"
+        @logger.error 'Initialization failed!'
         @logger.error e.inspect
       end
     end
@@ -58,20 +58,18 @@ module EndpointBenchmark
         request = Net::HTTP::Head.new('/')
 
         logger.debug "Sending HTTP HEAD request: #{request}"
-        start_time = Time.now
         response = http.request(request)
-        elapsed_time = Time.now - start_time
 
-        logger.debug "Got [#{response.code}] response for HEAD" +
-            " request [#{request}]: #{response.body}"
+        logger.debug "Got [#{response.code}] response for HEAD \
+          request [#{request}]: #{response.body}"
         logger.info "Site responded with code: [#{response.code.to_i}]! :)"
         success = true
       rescue StandardError => e
-        logger.error "HEAD request failed!"
+        logger.error 'HEAD request failed!'
         logger.error e.inspect
-      ensure
-        return success
       end
+
+      success
     end
 
     def try_get_request
@@ -82,21 +80,18 @@ module EndpointBenchmark
         request = Net::HTTP::Get.new('/')
 
         logger.debug "Sending HTTP GET request: #{request}"
-
-        start_time = Time.now
         response = http.request(request)
-        elapsed_time = Time.now - start_time
 
-        logger.debug "Got [#{response.code}] response for GET request "+
-            "[#{request}]: #{response.body}"
+        logger.debug "Got [#{response.code}] response for GET request \
+          [#{request}]: #{response.body}"
         logger.info "Site responded with code: [#{response.code.to_i}]! :)"
         success = true
       rescue StandardError => e
-        logger.error "HEAD request failed!"
+        logger.error 'HEAD request failed!'
         logger.error e.inspect
-      ensure
-        return success
       end
+
+      success
     end
   end
 
