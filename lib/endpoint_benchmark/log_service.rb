@@ -15,21 +15,25 @@ module EndpointBenchmark
     end
 
     def initialize(**args)
-      if args.has_key?(:filename) && !args[:filename].nil?
+      if args.key?(:filename) && !args[:filename].nil?
         @logger ||= Logger.new(args[:filename])
       elsif !args[:handle].nil? && args[:handle].is_a?(Logger)
         @logger ||= args[:handle]
       end
       @logger.level = (Object.const_get(
-                "Logger::#{ENV['LOG_LEVEL'].upcase}") rescue Logger::INFO)
+                        "Logger::#{ENV['LOG_LEVEL'].upcase}"
+                        ) rescue Logger::INFO)
       puts "Log level: #{@logger.level}"
-      @verbose = (['true', 'false'].include?(ENV['VERBOSE'].to_s.downcase) ?
-        str_to_bool(ENV['VERBOSE'].to_s) : false) ||
-        EndpointBenchmark::DEFAULT_VERBOSITY
+      @verbose = EndpointBenchmark::DEFAULT_VERBOSITY
+      if %w[true false].include?(ENV['VERBOSE'].to_s.downcase)
+        @verbose = str_to_bool(ENV['VERBOSE'].to_s)
+      else
+        @verbose = false
+      end
     end
 
     def debug(msg)
-      @logger.debug {msg}
+      @logger.debug { msg }
       STDOUT.puts "DEBUG: #{msg}" if @verbose
     end
 
@@ -54,13 +58,17 @@ module EndpointBenchmark
     end
 
     private
+
     def str_to_bool(val)
+      ret = false
       case val.downcase
       when 'true'
-        return true
+        ret = true
       when 'false'
-        return false
+        ret = false
       end
+
+      ret
     end
   end
 end

@@ -15,7 +15,8 @@ ENV['VERBOSE'] = options[:verbose].to_s || 'false'
 ENV['LOG_LEVEL'] = 'INFO'
 
 # Initialize logger
-logger = EndpointBenchmark::LogService.make_from_filename("#{Dir.pwd}/#{EndpointBenchmark::DEFAULT_LOG_FILE}")
+logfile = "#{Dir.pwd}/#{EndpointBenchmark::DEFAULT_LOG_FILE}"
+logger = EndpointBenchmark::LogService.make_from_filename(logfile)
 
 # Provide log handle in options hash
 options[:logger] = logger
@@ -23,9 +24,11 @@ options[:logger] = logger
 avg_resp_time = EndpointBenchmark::BenchmarkTool.begin_benchmark(options)
 
 if avg_resp_time == -1
-  puts "please check the logs at: #{Dir.pwd}/#{EndpointBenchmark::DEFAULT_LOG_FILE}"
+  puts "please check the logs at: \
+       #{Dir.pwd}/#{EndpointBenchmark::DEFAULT_LOG_FILE}"
   exit(1)
 else
-  puts "Average response time for #{options[:type]}://#{options[:host]} is: #{avg_resp_time}"
+  puts "Average response time for #{options[:type]}://#{options[:host]} is: \
+       #{avg_resp_time}"
   exit(0)
 end
